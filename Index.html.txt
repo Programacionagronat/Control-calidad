@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Calidad - Agronat</title>
+<style>
+  :root {
+    --azul: #1F4E79;
+    --azul2: #2E75B6;
+    --azul-claro: #D6E4F0;
+    --gris: #F2F2F2;
+    --rojo: #FCE4D6;
+    --verde: #E2EFDA;
+    --amarillo: #FFF2CC;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    background: #f5f6f8;
+    color: #222;
+  }
+  header {
+    background: var(--azul);
+    color: white;
+    padding: 20px 24px;
+  }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 4px 0 0; font-size: 13px; color: var(--azul-claro); }
+
+  nav {
+    display: flex;
+    gap: 8px;
+    background: white;
+    padding: 10px 24px;
+    border-bottom: 1px solid #ddd;
+  }
+  nav button {
+    background: none;
+    border: none;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #666;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+  }
+  nav button.activo {
+    color: var(--azul);
+    border-bottom: 3px solid var(--azul2);
+  }
+
+  main {
+    max-width: 900px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  .tarjeta {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+  }
+
+  .productos {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .productos button {
+    flex: 1;
+    min-width: 120px;
+    padding: 14px;
+    border: 2px solid var(--azul-claro);
+    background: white;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--azul);
+    cursor: pointer;
+  }
+  .productos button.activo {
+    background: var(--azul);
+    color: white;
+    border-color: var(--azul);
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  textarea { resize: vertical; min-height: 60px; }
+
+  .fila-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .fila-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  .btn-principal {
+    margin-top: 20px;
+    background: var(--azul2);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+  }
+  .btn-principal:hover { background: var(--azul); }
+  .btn-secundario {
+    background: var(--gris);
+    color: #444;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .aviso {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+  .aviso.ok { background: var(--verde); color: #1b5e20; }
+  .aviso.error { background: var(--rojo); color: #7b1c00; }
+  .aviso.info { background: var(--azul-claro); color: var(--azul); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--azul); color: white; padding: 8px; text-align: left; }
+  td { padding: 8px; border-bottom: 1px solid #eee; }
+  tr:hover { background: var(--gris); }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+    background: var(--azul-claro);
+    color: var(--azul);
+  }
+
+  .filtros { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+
+  .nir-box {
+    background: var(--amarillo);
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  @media (max-width: 700px) {
+    .fila-2, .fila-3, .filtros { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Control de Calidad</h1>
+  <p>Agronat S.A. - Soja, Maiz, Expeller de soja, Aceite de soja</p>
+</header>
+
+<nav>
+  <button id="navNuevo" class="activo" onclick="mostrarVista('nuevo')">Nuevo analisis</button>
+  <button id="navConsultar" onclick="mostrarVista('consultar')">Consultar</button>
+</nav>
+
+<main>
+
+  <!-- ===================== VISTA: NUEVO ANALISIS ===================== -->
+  <div id="vistaNuevo">
+    <div class="tarjeta">
+      <label>Elegi el producto</label>
+      <div class="productos" id="botonesProducto"></div>
+
+      <div id="formularioComun" style="display:none;">
+        <div class="fila-2">
+          <div>
+            <label>Operador</label>
+            <input type="text" id="campoOperador" placeholder="Quien hizo el analisis">
+          </div>
+          <div>
+            <label>Tipo</label>
+            <select id="campoTipo">
+              <option value="Proveedor">Proveedor (materia prima entrante)</option>
+              <option value="Cliente">Cliente (producto saliente)</option>
+            </select>
+          </div>
+        </div>
+        <div class="fila-3">
+          <div>
+            <label>Proveedor / Cliente</label>
+            <input type="text" id="campoProveedorCliente" placeholder="Nombre del proveedor o cliente">
+          </div>
+          <div>
+            <label>Nro. de orden de compra/venta</label>
+            <input type="text" id="campoOrdenCompraVenta" placeholder="Ej: OC-1234 o OV-5678">
+          </div>
+          <div>
+            <label>Lote / Identificacion de la muestra</label>
+            <input type="text" id="campoLote" placeholder="Ej: camion, silo, lote">
+          </div>
+        </div>
+
+        <div id="nirBox" class="nir-box" style="display:none;">
+          <b>Expeller de soja:</b> la carga automatica desde el NIR todavia no esta conectada.
+          Por ahora carga los valores a mano, igual que en los demas productos.
+          Cuando conectemos el NIR, el boton de abajo va a completar los campos solo,
+          pero siempre vas a poder editarlos o cargarlos a mano si lo necesitas.
+          <br><br>
+          <button type="button" class="btn-secundario" disabled>Autocompletar desde NIR (proximamente)</button>
+        </div>
+
+        <div id="camposParametros"></div>
+
+        <label>Observaciones</label>
+        <textarea id="campoObservaciones" placeholder="Notas adicionales (opcional)"></textarea>
+
+        <button class="btn-principal" onclick="guardarAnalisis()">Guardar analisis</button>
+        <div id="avisoGuardar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== VISTA: CONSULTAR ===================== -->
+  <div id="vistaConsultar" style="display:none;">
+    <div class="tarjeta">
+      <label>Elegi el producto a consultar</label>
+      <div class="productos" id="botonesProductoConsulta"></div>
+
+      <div class="filtros" style="margin-top:16px;">
+        <div>
+          <label>Proveedor / Cliente</label>
+          <input type="text" id="filtroProveedorCliente" placeholder="Buscar por nombre">
+        </div>
+        <div>
+          <label>Desde</label>
+          <input type="date" id="filtroDesde">
+        </div>
+        <div>
+          <label>Hasta</label>
+          <input type="date" id="filtroHasta">
+        </div>
+        <div>
+          <button class="btn-principal" style="margin-top:0;" onclick="buscarAnalisis()">Buscar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <div id="resultadosConsulta">
+        <p style="color:#888;">Elegi un producto y presiona Buscar.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ============================================================================
+// CONFIGURACION
+// ============================================================================
+// Pegar aqui la URL de tu Apps Script publicado como aplicacion web
+// (la que termina en /exec)
+const API_URL = 'https://script.google.com/a/macros/agronat.com.uy/s/AKfycbzofWoIB_9hABhPQbZgkc1Aw7ysuz-lNZWvXB10sB0QizKZn9KDvqXR8R51HEPRj7Y5/exec';
+
+// ============================================================================
+// ESTADO
+// ============================================================================
+let parametrosPorProducto = {};
+let productoActivoNuevo = null;
+let productoActivoConsulta = null;
+
+const PRODUCTOS = ['Soja', 'Maiz', 'Expeller', 'Aceite'];
+
+// ============================================================================
+// INICIO
+// ============================================================================
+window.addEventListener('DOMContentLoaded', () => {
+  renderBotonesProducto('botonesProducto', seleccionarProductoNuevo);
+  renderBotonesProducto('botonesProductoConsulta', seleccionarProductoConsulta);
+  cargarParametros();
+});
+
+function renderBotonesProducto(idContenedor, onClick) {
+  const cont = document.getElementById(idContenedor);
+  cont.innerHTML = '';
+  PRODUCTOS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.textContent = p;
+    btn.onclick = () => onClick(p, btn, cont);
+    cont.appendChild(btn);
+  });
+}
+
+async function cargarParametros() {
+  try {
+    const res = await fetch(API_URL + '?accion=parametros');
+    const data = await res.json();
+    if (data.ok) {
+      parametrosPorProducto = data.parametros;
+    }
+  } catch (e) {
+    console.error('No se pudo cargar parametros desde la API', e);
+  }
+}
+
+// ============================================================================
+// NAVEGACION
+// ============================================================================
+function mostrarVista(vista) {
+  document.getElementById('vistaNuevo').style.display = vista === 'nuevo' ? 'block' : 'none';
+  document.getElementById('vistaConsultar').style.display = vista === 'consultar' ? 'block' : 'none';
+  document.getElementById('navNuevo').classList.toggle('activo', vista === 'nuevo');
+  document.getElementById('navConsultar').classList.toggle('activo', vista === 'consultar');
+}
+
+// ============================================================================
+// NUEVO ANALISIS
+// ============================================================================
+function seleccionarProductoNuevo(producto, btn, cont) {
+  productoActivoNuevo = producto;
+  [...cont.children].forEach(b => b.classList.remove('activo'));
+  btn.classList.add('activo');
+
+  document.getElementById('formularioComun').style.display = 'block';
+  document.getElementById('nirBox').style.display = producto === 'Expeller' ? 'block' : 'none';
+  renderCamposParametros(producto);
+}
+
+function renderCamposParametros(producto) {
+  const cont = document.getElementById('camposParametros');
+  cont.innerHTML = '';
+  const params = parametrosPorProducto[producto] || [];
+
+  for (let i = 0; i < params.length; i += 2) {
+    const fila = document.createElement('div');
+    fila.className = 'fila-2';
+    for (let j = i; j < i + 2 && j < params.length; j++) {
+      const p = params[j];
+      const div = document.createElement('div');
+      const etiquetaUnidad = p.unidad ? p.etiqueta + ' (' + p.unidad + ')' : p.etiqueta;
+      div.innerHTML = '<label>' + etiquetaUnidad + '</label>' +
+        '<input type="number" step="any" id="param_' + p.clave + '" placeholder="Resultado">';
+      fila.appendChild(div);
+    }
+    cont.appendChild(fila);
+  }
+}
+
+async function guardarAnalisis() {
+  const aviso = document.getElementById('avisoGuardar');
+  aviso.innerHTML = '';
+
+  if (!productoActivoNuevo) {
+    aviso.innerHTML = '<div class="aviso error">Elegi un producto primero.</div>';
+    return;
+  }
+
+  const datos = {
+    operador: document.getElementById('campoOperador').value,
+    tipo: document.getElementById('campoTipo').value,
+    proveedorCliente: document.getElementById('campoProveedorCliente').value,
+    ordenCompraVenta: document.getElementById('campoOrdenCompraVenta').value,
+    lote: document.getElementById('campoLote').value,
+    observaciones: document.getElementById('campoObservaciones').value,
+    origenDato: 'Manual'
+  };
+
+  const params = parametrosPorProducto[productoActivoNuevo] || [];
+  params.forEach(p => {
+    const el = document.getElementById('param_' + p.clave);
+    datos[p.clave] = el ? el.value : '';
+  });
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'crear', producto: productoActivoNuevo, datos: datos })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      aviso.innerHTML = '<div class="aviso ok">Guardado correctamente. ID: ' + data.id + '</div>';
+      limpiarFormulario();
+    } else {
+      aviso.innerHTML = '<div class="aviso error">Error: ' + data.error + '</div>';
+    }
+  } catch (e) {
+    aviso.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor. Revisa la URL de la API.</div>';
+  }
+}
+
+function limpiarFormulario() {
+  document.getElementById('campoOperador').value = '';
+  document.getElementById('campoProveedorCliente').value = '';
+  document.getElementById('campoOrdenCompraVenta').value = '';
+  document.getElementById('campoLote').value = '';
+  document.getElementById('campoObservaciones').value = '';
+  const params = parametrosPorProducto[productoActivoNuevo] || [];
+  params.forEach(p => {
+    const el = document.getElementById('param_' + p.clave);
+    if (el) el.value = '';
+  });
+}
+
+// ============================================================================
+// CONSULTAR
+// ============================================================================
+function seleccionarProductoConsulta(producto, btn, cont) {
+  productoActivoConsulta = producto;
+  [...cont.children].forEach(b => b.classList.remove('activo'));
+  btn.classList.add('activo');
+}
+
+async function buscarAnalisis() {
+  const cont = document.getElementById('resultadosConsulta');
+  if (!productoActivoConsulta) {
+    cont.innerHTML = '<p style="color:#888;">Elegi un producto primero.</p>';
+    return;
+  }
+
+  cont.innerHTML = '<p style="color:#888;">Buscando...</p>';
+
+  const proveedorCliente = document.getElementById('filtroProveedorCliente').value;
+  const desde = document.getElementById('filtroDesde').value;
+  const hasta = document.getElementById('filtroHasta').value;
+
+  let url = API_URL + '?accion=listar&producto=' + encodeURIComponent(productoActivoConsulta);
+  if (proveedorCliente) url += '&proveedorCliente=' + encodeURIComponent(proveedorCliente);
+  if (desde) url += '&desde=' + encodeURIComponent(desde);
+  if (hasta) url += '&hasta=' + encodeURIComponent(hasta);
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.ok) {
+      cont.innerHTML = '<div class="aviso error">Error: ' + data.error + '</div>';
+      return;
+    }
+    renderTablaResultados(data.registros);
+  } catch (e) {
+    cont.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor.</div>';
+  }
+}
+
+function renderTablaResultados(registros) {
+  const cont = document.getElementById('resultadosConsulta');
+  if (registros.length === 0) {
+    cont.innerHTML = '<p style="color:#888;">No se encontraron analisis con esos filtros.</p>';
+    return;
+  }
+
+  let html = '<table><tr><th>Fecha</th><th>Proveedor/Cliente</th><th>Nro. Orden</th><th>Lote</th><th>Operador</th><th>PDF</th></tr>';
+  registros.forEach(r => {
+    html += '<tr>' +
+      '<td>' + r.fecha + '</td>' +
+      '<td>' + (r.proveedorCliente || '-') + '</td>' +
+      '<td>' + (r.ordenCompraVenta || '-') + '</td>' +
+      '<td>' + (r.lote || '-') + ' <span class="badge">' + r.id + '</span></td>' +
+      '<td>' + (r.operador || '-') + '</td>' +
+      '<td><button class="btn-secundario" onclick="descargarPDF(\'' + r.id + '\')">Descargar</button></td>' +
+      '</tr>';
+  });
+  html += '</table>';
+  cont.innerHTML = html;
+}
+
+async function descargarPDF(id) {
+  try {
+    const url = API_URL + '?accion=pdf&producto=' + encodeURIComponent(productoActivoConsulta) + '&id=' + encodeURIComponent(id);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.ok) {
+      alert('No se pudo generar el PDF: ' + data.error);
+      return;
+    }
+    const bytes = atob(data.base64);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    const blob = new Blob([arr], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = data.nombreArchivo;
+    link.click();
+  } catch (e) {
+    alert('Error al descargar el PDF.');
+  }
+}
+</script>
+
+</body>
+</html>

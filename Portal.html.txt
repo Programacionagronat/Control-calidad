@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Proveedores - Agronat</title>
+<style>
+  :root {
+    --azul: #1F4E79;
+    --azul2: #2E75B6;
+    --azul-claro: #D6E4F0;
+    --gris: #F2F2F2;
+    --rojo: #FCE4D6;
+    --verde: #E2EFDA;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    background: #f5f6f8;
+    color: #222;
+  }
+  header {
+    background: var(--azul);
+    color: white;
+    padding: 20px 24px;
+  }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 4px 0 0; font-size: 13px; color: var(--azul-claro); }
+
+  main {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 16px;
+  }
+
+  .tarjeta {
+    background: white;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    margin-bottom: 16px;
+  }
+
+  /* ----- Pantalla de login ----- */
+  #panelLogin { max-width: 380px; margin: 60px auto 0; }
+  #panelLogin h2 { margin-top: 0; color: var(--azul); font-size: 18px; text-align: center; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+    color: #444;
+    margin-top: 14px;
+    margin-bottom: 4px;
+  }
+  input, select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+  }
+
+  .btn-principal {
+    margin-top: 20px;
+    background: var(--azul2);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+  }
+  .btn-principal:hover { background: var(--azul); }
+  .btn-secundario {
+    background: var(--gris);
+    color: #444;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .aviso {
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-top: 14px;
+  }
+  .aviso.error { background: var(--rojo); color: #7b1c00; }
+  .aviso.info { background: var(--azul-claro); color: var(--azul); }
+
+  /* ----- Pantalla logueado ----- */
+  #panelPortal { display: none; }
+  .barra-usuario {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .barra-usuario span { font-size: 14px; color: #444; }
+
+  .productos {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .productos button {
+    flex: 1;
+    min-width: 110px;
+    padding: 12px;
+    border: 2px solid var(--azul-claro);
+    background: white;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--azul);
+    cursor: pointer;
+  }
+  .productos button.activo {
+    background: var(--azul);
+    color: white;
+    border-color: var(--azul);
+  }
+
+  .filtros { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 16px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--azul); color: white; padding: 8px; text-align: left; }
+  td { padding: 8px; border-bottom: 1px solid #eee; }
+  tr:hover { background: var(--gris); }
+
+  @media (max-width: 600px) {
+    .filtros { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Portal de Proveedores</h1>
+  <p>Agronat S.A. - Control de Calidad</p>
+</header>
+
+<main>
+
+  <!-- ===================== LOGIN ===================== -->
+  <div id="panelLogin" class="tarjeta">
+    <h2>Ingresar</h2>
+    <label>Usuario</label>
+    <input type="text" id="campoUsuario" autocomplete="username">
+    <label>Contrasena</label>
+    <input type="password" id="campoPassword" autocomplete="current-password">
+    <button class="btn-principal" onclick="iniciarSesion()">Ingresar</button>
+    <div id="avisoLogin"></div>
+  </div>
+
+  <!-- ===================== PORTAL (logueado) ===================== -->
+  <div id="panelPortal">
+    <div class="tarjeta barra-usuario">
+      <span>Hola, <b id="nombreProveedor"></b></span>
+      <button class="btn-secundario" onclick="cerrarSesionUsuario()">Cerrar sesion</button>
+    </div>
+
+    <div class="tarjeta">
+      <label>Elegi el producto</label>
+      <div class="productos" id="botonesProducto"></div>
+
+      <div class="filtros">
+        <div>
+          <label>Desde</label>
+          <input type="date" id="filtroDesde">
+        </div>
+        <div>
+          <label>Hasta</label>
+          <input type="date" id="filtroHasta">
+        </div>
+        <div>
+          <button class="btn-principal" style="margin-top:0;" onclick="buscarMisAnalisis()">Buscar</button>
+        </div>
+      </div>
+
+      <div id="resultados">
+        <p style="color:#888;">Elegi un producto y presiona Buscar.</p>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// Pegar aqui la URL de tu Apps Script publicado como aplicacion web
+// (la misma que usa index.html, la que termina en /exec)
+const API_URL = 'https://script.google.com/a/macros/agronat.com.uy/s/AKfycbzofWoIB_9hABhPQbZgkc1Aw7ysuz-lNZWvXB10sB0QizKZn9KDvqXR8R51HEPRj7Y5/exec';
+
+const PRODUCTOS = ['Soja', 'Maiz', 'Expeller', 'Aceite'];
+let productoActivo = null;
+
+// La sesion se guarda solo mientras la pestana del navegador esta abierta.
+// Al cerrarla, hay que volver a ingresar usuario y contrasena.
+function guardarSesion(token, proveedor) {
+  sessionStorage.setItem('qc_token', token);
+  sessionStorage.setItem('qc_proveedor', proveedor);
+}
+function obtenerToken() { return sessionStorage.getItem('qc_token'); }
+function obtenerProveedor() { return sessionStorage.getItem('qc_proveedor'); }
+function borrarSesion() {
+  sessionStorage.removeItem('qc_token');
+  sessionStorage.removeItem('qc_proveedor');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (obtenerToken()) {
+    mostrarPortal();
+  }
+  renderBotonesProducto();
+
+  // Permite tocar Enter para ingresar
+  document.getElementById('campoPassword').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') iniciarSesion();
+  });
+});
+
+async function iniciarSesion() {
+  const usuario = document.getElementById('campoUsuario').value.trim();
+  const password = document.getElementById('campoPassword').value;
+  const aviso = document.getElementById('avisoLogin');
+  aviso.innerHTML = '';
+
+  if (!usuario || !password) {
+    aviso.innerHTML = '<div class="aviso error">Completa usuario y contrasena.</div>';
+    return;
+  }
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'login', usuario: usuario, password: password })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      guardarSesion(data.token, data.proveedor);
+      document.getElementById('campoPassword').value = '';
+      mostrarPortal();
+    } else {
+      aviso.innerHTML = '<div class="aviso error">' + data.error + '</div>';
+    }
+  } catch (e) {
+    aviso.innerHTML = '<div class="aviso error">No se pudo conectar. Intenta de nuevo en un momento.</div>';
+  }
+}
+
+function mostrarPortal() {
+  document.getElementById('panelLogin').style.display = 'none';
+  document.getElementById('panelPortal').style.display = 'block';
+  document.getElementById('nombreProveedor').textContent = obtenerProveedor();
+}
+
+async function cerrarSesionUsuario() {
+  const token = obtenerToken();
+  borrarSesion();
+  document.getElementById('panelPortal').style.display = 'none';
+  document.getElementById('panelLogin').style.display = 'block';
+  document.getElementById('campoUsuario').value = '';
+  document.getElementById('resultados').innerHTML = '<p style="color:#888;">Elegi un producto y presiona Buscar.</p>';
+  productoActivo = null;
+  // Avisa al servidor para invalidar el token (no es obligatorio, pero es mas prolijo)
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'logout', token: token })
+    });
+  } catch (e) { /* no hace falta avisar si falla */ }
+}
+
+function renderBotonesProducto() {
+  const cont = document.getElementById('botonesProducto');
+  cont.innerHTML = '';
+  PRODUCTOS.forEach(p => {
+    const btn = document.createElement('button');
+    btn.textContent = p;
+    btn.onclick = () => {
+      productoActivo = p;
+      [...cont.children].forEach(b => b.classList.remove('activo'));
+      btn.classList.add('activo');
+    };
+    cont.appendChild(btn);
+  });
+}
+
+async function buscarMisAnalisis() {
+  const cont = document.getElementById('resultados');
+  if (!productoActivo) {
+    cont.innerHTML = '<p style="color:#888;">Elegi un producto primero.</p>';
+    return;
+  }
+
+  const token = obtenerToken();
+  if (!token) {
+    cerrarSesionUsuario();
+    return;
+  }
+
+  cont.innerHTML = '<p style="color:#888;">Buscando...</p>';
+
+  const desde = document.getElementById('filtroDesde').value;
+  const hasta = document.getElementById('filtroHasta').value;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        accion: 'portalListar',
+        token: token,
+        producto: productoActivo,
+        filtros: { desde: desde, hasta: hasta }
+      })
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      if (data.error && data.error.indexOf('sesion') !== -1) {
+        cerrarSesionUsuario();
+        return;
+      }
+      cont.innerHTML = '<div class="aviso error">' + data.error + '</div>';
+      return;
+    }
+    renderTabla(data.registros);
+  } catch (e) {
+    cont.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor.</div>';
+  }
+}
+
+function renderTabla(registros) {
+  const cont = document.getElementById('resultados');
+  if (registros.length === 0) {
+    cont.innerHTML = '<p style="color:#888;">No se encontraron analisis con esos filtros.</p>';
+    return;
+  }
+
+  let html = '<table><tr><th>Fecha</th><th>Nro. Orden</th><th>Lote</th><th>PDF</th></tr>';
+  registros.forEach(r => {
+    html += '<tr>' +
+      '<td>' + r.fecha + '</td>' +
+      '<td>' + (r.ordenCompraVenta || '-') + '</td>' +
+      '<td>' + (r.lote || '-') + '</td>' +
+      '<td><button class="btn-secundario" onclick="descargarMiPDF(\'' + r.id + '\')">Descargar</button></td>' +
+      '</tr>';
+  });
+  html += '</table>';
+  cont.innerHTML = html;
+}
+
+async function descargarMiPDF(id) {
+  const token = obtenerToken();
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'portalPDF', token: token, producto: productoActivo, id: id })
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      alert('No se pudo descargar el PDF: ' + data.error);
+      return;
+    }
+    const bytes = atob(data.base64);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    const blob = new Blob([arr], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = data.nombreArchivo;
+    link.click();
+  } catch (e) {
+    alert('Error al descargar el PDF.');
+  }
+}
+</script>
+
+</body>
+</html>
