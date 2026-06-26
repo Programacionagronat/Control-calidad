@@ -223,12 +223,14 @@
         </div>
 
         <div id="nirBox" class="nir-box" style="display:none;">
-          <b>Expeller de soja:</b> la carga automatica desde el NIR todavia no esta conectada.
-          Por ahora carga los valores a mano, igual que en los demas productos.
-          Cuando conectemos el NIR, el boton de abajo va a completar los campos solo,
-          pero siempre vas a poder editarlos o cargarlos a mano si lo necesitas.
+          <b>Expeller de soja:</b> este boton trae TODOS los resultados nuevos
+          que estan en la planilla del NIR y los agrega como analisis.
+          Los que ya se hayan importado antes no se duplican.
+          Esto es independiente del formulario de abajo: la carga manual
+          sigue funcionando igual para casos puntuales.
           <br><br>
-          <button type="button" class="btn-secundario" disabled>Autocompletar desde NIR (proximamente)</button>
+          <button type="button" class="btn-secundario" onclick="sincronizarNIR()">Sincronizar con NIR ahora</button>
+          <div id="avisoNIR"></div>
         </div>
 
         <div id="camposParametros"></div>
@@ -398,6 +400,28 @@ function renderCamposParametros(producto) {
       fila.appendChild(div);
     }
     cont.appendChild(fila);
+  }
+}
+
+async function sincronizarNIR() {
+  const aviso = document.getElementById('avisoNIR');
+  aviso.innerHTML = '<p style="color:#777; margin-top:8px;">Sincronizando...</p>';
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'sincronizarNIR' })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      aviso.innerHTML = '<div class="aviso ok" style="margin-top:8px;">' +
+        'Se importaron <b>' + data.importados + '</b> analisis nuevos. ' +
+        '(Total de resultados en el NIR: ' + data.totalEnNIR + ')</div>';
+    } else {
+      aviso.innerHTML = '<div class="aviso error" style="margin-top:8px;">' + data.error + '</div>';
+    }
+  } catch (e) {
+    aviso.innerHTML = '<div class="aviso error" style="margin-top:8px;">No se pudo conectar con el servidor.</div>';
   }
 }
 
