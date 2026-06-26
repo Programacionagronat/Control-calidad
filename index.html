@@ -182,6 +182,7 @@
 <nav>
   <button id="navNuevo" class="activo" onclick="mostrarVista('nuevo')">Nuevo analisis</button>
   <button id="navConsultar" onclick="mostrarVista('consultar')">Consultar</button>
+  <button id="navProveedores" onclick="mostrarVista('proveedores')">Proveedores</button>
 </nav>
 
 <main>
@@ -273,6 +274,37 @@
     </div>
   </div>
 
+  <!-- ===================== VISTA: PROVEEDORES ===================== -->
+  <div id="vistaProveedores" style="display:none;">
+    <div class="tarjeta">
+      <h3 style="margin-top:0; color: var(--azul);">Crear acceso para un proveedor</h3>
+      <p style="color:#666; font-size:13px;">
+        Esto le crea a un proveedor un usuario y una contrasena para que entre
+        a su propio portal y vea solo sus analisis. El usuario y el PIN se
+        generan solos - despues de crearlo, copialos y pasaselos al proveedor
+        (por telefono o WhatsApp, por ejemplo). No vas a poder volver a ver
+        ese PIN despues, asi que copialo antes de cerrar esta pantalla.
+      </p>
+
+      <label>Nombre del proveedor (tiene que ser EXACTAMENTE igual a como lo escribis en "Proveedor / Cliente" en los analisis)</label>
+      <input type="text" id="campoNombreProveedor" placeholder="Ej: Molino Santa Rosa" oninput="sugerirUsuarioEnPantalla()">
+
+      <label>Usuario (se sugiere solo, pero lo podes cambiar)</label>
+      <input type="text" id="campoUsuarioSugerido" placeholder="se completa solo">
+
+      <button class="btn-principal" onclick="crearAccesoProveedor()">Crear acceso</button>
+      <div id="avisoProveedor"></div>
+    </div>
+
+    <div class="tarjeta">
+      <h3 style="margin-top:0; color: var(--azul);">Accesos ya creados</h3>
+      <button class="btn-secundario" onclick="cargarListaUsuarios()">Actualizar lista</button>
+      <div id="listaUsuarios" style="margin-top:12px;">
+        <p style="color:#888;">Presiona "Actualizar lista" para verlos.</p>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -281,7 +313,7 @@
 // ============================================================================
 // Pegar aqui la URL de tu Apps Script publicado como aplicacion web
 // (la que termina en /exec)
-const API_URL = 'https://script.google.com/macros/s/AKfycbyj9BXuVUwB09Kc5opWxuBysGokv5xtWS84sTDxvkfOO6YeX8Y3bniz-jfbF4FqhvEq/exec';
+const API_URL = 'PEGAR_AQUI_LA_URL_DE_TU_APPS_SCRIPT';
 
 // ============================================================================
 // ESTADO
@@ -330,8 +362,10 @@ async function cargarParametros() {
 function mostrarVista(vista) {
   document.getElementById('vistaNuevo').style.display = vista === 'nuevo' ? 'block' : 'none';
   document.getElementById('vistaConsultar').style.display = vista === 'consultar' ? 'block' : 'none';
+  document.getElementById('vistaProveedores').style.display = vista === 'proveedores' ? 'block' : 'none';
   document.getElementById('navNuevo').classList.toggle('activo', vista === 'nuevo');
   document.getElementById('navConsultar').classList.toggle('activo', vista === 'consultar');
+  document.getElementById('navProveedores').classList.toggle('activo', vista === 'proveedores');
 }
 
 // ============================================================================
@@ -504,6 +538,79 @@ async function descargarPDF(id) {
     link.click();
   } catch (e) {
     alert('Error al descargar el PDF.');
+  }
+}
+
+// ============================================================================
+// PROVEEDORES
+// ============================================================================
+function sugerirUsuarioEnPantalla() {
+  const nombre = document.getElementById('campoNombreProveedor').value;
+  let s = nombre.toLowerCase();
+  s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  s = s.replace(/[^a-z0-9]/g, '');
+  if (s.length > 14) s = s.substring(0, 14);
+  document.getElementById('campoUsuarioSugerido').value = s;
+}
+
+async function crearAccesoProveedor() {
+  const aviso = document.getElementById('avisoProveedor');
+  aviso.innerHTML = '';
+
+  const nombreProveedor = document.getElementById('campoNombreProveedor').value.trim();
+  const usuario = document.getElementById('campoUsuarioSugerido').value.trim();
+
+  if (!nombreProveedor) {
+    aviso.innerHTML = '<div class="aviso error">Falta el nombre del proveedor.</div>';
+    return;
+  }
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'crearProveedorWeb', nombreProveedor: nombreProveedor, usuario: usuario })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      aviso.innerHTML = '<div class="aviso ok">' +
+        '<b>Acceso creado.</b> Copia estos datos y pasaselos al proveedor:<br><br>' +
+        'Usuario: <b>' + data.usuario + '</b><br>' +
+        'Contrasena (PIN): <b>' + data.password + '</b>' +
+        '</div>';
+      document.getElementById('campoNombreProveedor').value = '';
+      document.getElementById('campoUsuarioSugerido').value = '';
+      cargarListaUsuarios();
+    } else {
+      aviso.innerHTML = '<div class="aviso error">' + data.error + '</div>';
+    }
+  } catch (e) {
+    aviso.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor.</div>';
+  }
+}
+
+async function cargarListaUsuarios() {
+  const cont = document.getElementById('listaUsuarios');
+  cont.innerHTML = '<p style="color:#888;">Cargando...</p>';
+  try {
+    const res = await fetch(API_URL + '?accion=listarUsuarios');
+    const data = await res.json();
+    if (!data.ok) {
+      cont.innerHTML = '<div class="aviso error">' + data.error + '</div>';
+      return;
+    }
+    if (data.usuarios.length === 0) {
+      cont.innerHTML = '<p style="color:#888;">Todavia no hay accesos creados.</p>';
+      return;
+    }
+    let html = '<table><tr><th>Usuario</th><th>Proveedor</th><th>Activo</th></tr>';
+    data.usuarios.forEach(u => {
+      html += '<tr><td>' + u.usuario + '</td><td>' + u.proveedor + '</td><td>' + (u.activo ? 'Si' : 'No') + '</td></tr>';
+    });
+    html += '</table>';
+    cont.innerHTML = html;
+  } catch (e) {
+    cont.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor.</div>';
   }
 }
 </script>
