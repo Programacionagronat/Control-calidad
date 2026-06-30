@@ -6,177 +6,285 @@
 <title>Control de Calidad - Agronat</title>
 <style>
   :root {
-    --azul: #1F4E79;
-    --azul2: #2E75B6;
-    --azul-claro: #D6E4F0;
-    --gris: #F2F2F2;
-    --rojo: #FCE4D6;
-    --verde: #E2EFDA;
-    --amarillo: #FFF2CC;
+    --verde:         #4A8B80;
+    --verde-oscuro:  #2D6960;
+    --verde-claro:   #EBF5F3;
+    --naranja:       #E8922A;
+    --naranja-claro: #FEF6EC;
+    --gris-fondo:    #F4F7F6;
+    --gris-borde:    #DDE8E5;
+    --blanco:        #FFFFFF;
+    --texto:         #1E3532;
+    --texto-suave:   #5D7E79;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: Arial, Helvetica, sans-serif;
-    margin: 0;
-    background: #f5f6f8;
-    color: #222;
+    background: var(--gris-fondo);
+    color: var(--texto);
+    font-size: 14px;
+    line-height: 1.5;
   }
-  header {
-    background: var(--azul);
-    color: white;
-    padding: 20px 24px;
-  }
-  header h1 { margin: 0; font-size: 22px; }
-  header p { margin: 4px 0 0; font-size: 13px; color: var(--azul-claro); }
 
-  nav {
+  /* ── HEADER ── */
+  header {
+    background: var(--blanco);
+    border-bottom: 3px solid var(--verde);
+    padding: 0 24px;
     display: flex;
-    gap: 8px;
-    background: white;
-    padding: 10px 24px;
-    border-bottom: 1px solid #ddd;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
+  }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-logo img {
+    height: 38px;
+    display: block;
+  }
+  .header-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--gris-borde);
+  }
+  .header-titulo {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--verde);
+    letter-spacing: 0.02em;
+  }
+  .header-subtitulo {
+    font-size: 11px;
+    color: var(--texto-suave);
+    margin-top: 1px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--blanco);
+    border-bottom: 1px solid var(--gris-borde);
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
   }
   nav button {
     background: none;
     border: none;
-    padding: 10px 18px;
-    font-size: 14px;
-    font-weight: bold;
-    color: #666;
-    cursor: pointer;
     border-bottom: 3px solid transparent;
+    padding: 14px 18px 11px;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--texto-suave);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
   }
+  nav button:hover { color: var(--verde); }
   nav button.activo {
-    color: var(--azul);
-    border-bottom: 3px solid var(--azul2);
+    color: var(--verde);
+    border-bottom-color: var(--naranja);
   }
 
+  /* ── LAYOUT ── */
   main {
-    max-width: 900px;
+    max-width: 920px;
     margin: 24px auto;
     padding: 0 16px;
   }
-
   .tarjeta {
-    background: white;
+    background: var(--blanco);
     border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 22px;
+    box-shadow: 0 1px 4px rgba(45,105,96,0.08);
     margin-bottom: 16px;
+    border: 1px solid var(--gris-borde);
+  }
+  .tarjeta h3 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    color: var(--verde);
   }
 
+  /* ── PRODUCTO SELECTOR ── */
   .productos {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
+    margin-bottom: 6px;
   }
   .productos button {
     flex: 1;
-    min-width: 120px;
-    padding: 14px;
-    border: 2px solid var(--azul-claro);
-    background: white;
+    min-width: 110px;
+    padding: 12px 10px;
+    border: 2px solid var(--gris-borde);
+    background: var(--blanco);
     border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    color: var(--azul);
-    cursor: pointer;
-  }
-  .productos button.activo {
-    background: var(--azul);
-    color: white;
-    border-color: var(--azul);
-  }
-
-  label {
-    display: block;
     font-size: 13px;
     font-weight: bold;
-    color: #444;
-    margin-top: 12px;
-    margin-bottom: 4px;
+    color: var(--texto-suave);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .productos button:hover {
+    border-color: var(--verde);
+    color: var(--verde);
+  }
+  .productos button.activo {
+    background: var(--naranja);
+    border-color: var(--naranja);
+    color: var(--blanco);
+  }
+
+  /* ── FORMULARIO ── */
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 14px;
+    margin-bottom: 5px;
   }
   input, select, textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 9px 11px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 5px;
     font-size: 14px;
+    color: var(--texto);
+    background: var(--blanco);
+    transition: border-color 0.15s;
   }
-  textarea { resize: vertical; min-height: 60px; }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--verde);
+    box-shadow: 0 0 0 3px rgba(74,139,128,0.12);
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  .fila-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fila-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 
-  .fila-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .fila-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-
+  /* ── BOTONES ── */
   .btn-principal {
-    margin-top: 20px;
-    background: var(--azul2);
-    color: white;
+    margin-top: 18px;
+    background: var(--verde);
+    color: var(--blanco);
     border: none;
     padding: 12px 20px;
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     width: 100%;
+    transition: background 0.15s;
   }
-  .btn-principal:hover { background: var(--azul); }
+  .btn-principal:hover { background: var(--verde-oscuro); }
   .btn-secundario {
-    background: var(--gris);
-    color: #444;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 4px;
+    background: var(--gris-fondo);
+    color: var(--texto);
+    border: 1px solid var(--gris-borde);
+    padding: 7px 13px;
+    border-radius: 5px;
     font-size: 13px;
     cursor: pointer;
+    transition: background 0.15s;
   }
+  .btn-secundario:hover { background: var(--verde-claro); }
 
+  /* ── AVISOS ── */
   .aviso {
     padding: 10px 14px;
     border-radius: 6px;
     font-size: 13px;
     margin-top: 12px;
+    border-left: 4px solid;
   }
-  .aviso.ok { background: var(--verde); color: #1b5e20; }
-  .aviso.error { background: var(--rojo); color: #7b1c00; }
-  .aviso.info { background: var(--azul-claro); color: var(--azul); }
+  .aviso.ok    { background: #EDF7F0; border-color: #3A9E6A; color: #1B5E3A; }
+  .aviso.error { background: #FEF0EC; border-color: #E05A35; color: #7B2210; }
+  .aviso.info  { background: var(--verde-claro); border-color: var(--verde); color: var(--verde-oscuro); }
 
+  /* ── NIR BOX ── */
+  .nir-box {
+    background: var(--naranja-claro);
+    border: 1px solid #F5C88A;
+    border-left: 4px solid var(--naranja);
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #6B3D0A;
+  }
+
+  /* ── TABLA ── */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { background: var(--azul); color: white; padding: 8px; text-align: left; }
-  td { padding: 8px; border-bottom: 1px solid #eee; }
-  tr:hover { background: var(--gris); }
-
+  th {
+    background: var(--verde);
+    color: var(--blanco);
+    padding: 9px 10px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+  }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--gris-borde); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--verde-claro); }
   .badge {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 2px 7px;
     border-radius: 10px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
-    background: var(--azul-claro);
-    color: var(--azul);
+    background: var(--verde-claro);
+    color: var(--verde-oscuro);
+    margin-left: 4px;
   }
 
-  .filtros { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+  /* ── FILTROS ── */
+  .filtros {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+  .filtros .btn-principal {
+    margin-top: 0;
+    white-space: nowrap;
+  }
 
-  .nir-box {
-    background: var(--amarillo);
-    border-radius: 6px;
-    padding: 12px;
-    margin-top: 12px;
-    font-size: 13px;
+  /* ── SECCION LABEL ── */
+  .seccion-label {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--texto-suave);
+    margin-bottom: 10px;
   }
 
   @media (max-width: 700px) {
     .fila-2, .fila-3, .filtros { grid-template-columns: 1fr; }
+    .productos button { min-width: calc(50% - 5px); }
+    header { height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Control de Calidad</h1>
-  <p>Agronat S.A. - Soja, Maiz, Expeller de soja, Aceite de soja</p>
+  <div class="header-logo">
+    <img src="./logo.png" alt="Agronat">
+    <div class="header-divider"></div>
+    <div>
+      <div class="header-titulo">Control de Calidad</div>
+      <div class="header-subtitulo">Laboratorio · Agronat</div>
+    </div>
+  </div>
 </header>
 
 <nav>
@@ -190,7 +298,7 @@
   <!-- ===================== VISTA: NUEVO ANALISIS ===================== -->
   <div id="vistaNuevo">
     <div class="tarjeta">
-      <label>Elegi el producto</label>
+      <p class="seccion-label">Elegi el producto</p>
       <div class="productos" id="botonesProducto"></div>
 
       <div id="formularioComun" style="display:none;">
@@ -210,24 +318,22 @@
         <div class="fila-3">
           <div>
             <label>Proveedor / Cliente</label>
-            <input type="text" id="campoProveedorCliente" placeholder="Nombre del proveedor o cliente">
+            <input type="text" id="campoProveedorCliente" placeholder="Nombre">
           </div>
           <div>
             <label>Nro. de orden de compra/venta</label>
-            <input type="text" id="campoOrdenCompraVenta" placeholder="Ej: OC-1234 o OV-5678">
+            <input type="text" id="campoOrdenCompraVenta" placeholder="Ej: OC-1234">
           </div>
           <div>
-            <label>Lote / Identificacion de la muestra</label>
+            <label>Lote / Identificacion</label>
             <input type="text" id="campoLote" placeholder="Ej: camion, silo, lote">
           </div>
         </div>
 
         <div id="nirBox" class="nir-box" style="display:none;">
-          <b>Expeller de soja:</b> este boton trae TODOS los resultados nuevos
-          que estan en la planilla del NIR y los agrega como analisis.
-          Los que ya se hayan importado antes no se duplican.
-          Esto es independiente del formulario de abajo: la carga manual
-          sigue funcionando igual para casos puntuales.
+          <b>Expeller de soja:</b> este boton trae todos los resultados nuevos
+          que estan en la planilla del NIR. Los que ya se importaron antes no se duplican.
+          La carga manual sigue disponible abajo para casos puntuales.
           <br><br>
           <button type="button" class="btn-secundario" onclick="sincronizarNIR()">Sincronizar con NIR ahora</button>
           <div id="avisoNIR"></div>
@@ -247,10 +353,10 @@
   <!-- ===================== VISTA: CONSULTAR ===================== -->
   <div id="vistaConsultar" style="display:none;">
     <div class="tarjeta">
-      <label>Elegi el producto a consultar</label>
+      <p class="seccion-label">Elegi el producto a consultar</p>
       <div class="productos" id="botonesProductoConsulta"></div>
 
-      <div class="filtros" style="margin-top:16px;">
+      <div class="filtros">
         <div>
           <label>Proveedor / Cliente</label>
           <input type="text" id="filtroProveedorCliente" placeholder="Buscar por nombre">
@@ -264,14 +370,14 @@
           <input type="date" id="filtroHasta">
         </div>
         <div>
-          <button class="btn-principal" style="margin-top:0;" onclick="buscarAnalisis()">Buscar</button>
+          <button class="btn-principal" onclick="buscarAnalisis()">Buscar</button>
         </div>
       </div>
     </div>
 
     <div class="tarjeta">
       <div id="resultadosConsulta">
-        <p style="color:#888;">Elegi un producto y presiona Buscar.</p>
+        <p style="color:var(--texto-suave);">Elegi un producto y presiona Buscar.</p>
       </div>
     </div>
   </div>
@@ -279,19 +385,16 @@
   <!-- ===================== VISTA: PROVEEDORES ===================== -->
   <div id="vistaProveedores" style="display:none;">
     <div class="tarjeta">
-      <h3 style="margin-top:0; color: var(--azul);">Crear acceso para un proveedor</h3>
-      <p style="color:#666; font-size:13px;">
-        Esto le crea a un proveedor un usuario y una contrasena para que entre
-        a su propio portal y vea solo sus analisis. El usuario y el PIN se
-        generan solos - despues de crearlo, copialos y pasaselos al proveedor
-        (por telefono o WhatsApp, por ejemplo). No vas a poder volver a ver
-        ese PIN despues, asi que copialo antes de cerrar esta pantalla.
+      <h3>Crear acceso para un proveedor</h3>
+      <p style="color:var(--texto-suave); font-size:13px; margin-top:6px;">
+        Genera usuario y PIN para que el proveedor entre al portal y vea solo sus analisis.
+        El PIN se muestra una sola vez — copialos antes de cerrar esta pantalla.
       </p>
 
-      <label>Nombre del proveedor (tiene que ser EXACTAMENTE igual a como lo escribis en "Proveedor / Cliente" en los analisis)</label>
+      <label>Nombre del proveedor <span style="font-weight:normal; text-transform:none; letter-spacing:0;">(tiene que ser EXACTAMENTE igual a como lo escribis en "Proveedor / Cliente" en los analisis)</span></label>
       <input type="text" id="campoNombreProveedor" placeholder="Ej: Molino Santa Rosa" oninput="sugerirUsuarioEnPantalla()">
 
-      <label>Usuario (se sugiere solo, pero lo podes cambiar)</label>
+      <label>Usuario <span style="font-weight:normal; text-transform:none; letter-spacing:0;">(se sugiere solo, pero lo podes cambiar)</span></label>
       <input type="text" id="campoUsuarioSugerido" placeholder="se completa solo">
 
       <button class="btn-principal" onclick="crearAccesoProveedor()">Crear acceso</button>
@@ -299,10 +402,12 @@
     </div>
 
     <div class="tarjeta">
-      <h3 style="margin-top:0; color: var(--azul);">Accesos ya creados</h3>
-      <button class="btn-secundario" onclick="cargarListaUsuarios()">Actualizar lista</button>
-      <div id="listaUsuarios" style="margin-top:12px;">
-        <p style="color:#888;">Presiona "Actualizar lista" para verlos.</p>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <h3 style="margin:0;">Accesos ya creados</h3>
+        <button class="btn-secundario" onclick="cargarListaUsuarios()">Actualizar lista</button>
+      </div>
+      <div id="listaUsuarios">
+        <p style="color:var(--texto-suave);">Presiona "Actualizar lista" para verlos.</p>
       </div>
     </div>
   </div>
@@ -310,25 +415,14 @@
 </main>
 
 <script>
-// ============================================================================
-// CONFIGURACION
-// ============================================================================
-// Pegar aqui la URL de tu Apps Script publicado como aplicacion web
-// (la que termina en /exec)
 const API_URL = 'https://script.google.com/macros/s/AKfycbyj9BXuVUwB09Kc5opWxuBysGokv5xtWS84sTDxvkfOO6YeX8Y3bniz-jfbF4FqhvEq/exec';
 
-// ============================================================================
-// ESTADO
-// ============================================================================
 let parametrosPorProducto = {};
 let productoActivoNuevo = null;
 let productoActivoConsulta = null;
 
 const PRODUCTOS = ['Soja', 'Maiz', 'Expeller', 'Aceite'];
 
-// ============================================================================
-// INICIO
-// ============================================================================
 window.addEventListener('DOMContentLoaded', () => {
   renderBotonesProducto('botonesProducto', seleccionarProductoNuevo);
   renderBotonesProducto('botonesProductoConsulta', seleccionarProductoConsulta);
@@ -358,9 +452,6 @@ async function cargarParametros() {
   }
 }
 
-// ============================================================================
-// NAVEGACION
-// ============================================================================
 function mostrarVista(vista) {
   document.getElementById('vistaNuevo').style.display = vista === 'nuevo' ? 'block' : 'none';
   document.getElementById('vistaConsultar').style.display = vista === 'consultar' ? 'block' : 'none';
@@ -370,14 +461,10 @@ function mostrarVista(vista) {
   document.getElementById('navProveedores').classList.toggle('activo', vista === 'proveedores');
 }
 
-// ============================================================================
-// NUEVO ANALISIS
-// ============================================================================
 function seleccionarProductoNuevo(producto, btn, cont) {
   productoActivoNuevo = producto;
   [...cont.children].forEach(b => b.classList.remove('activo'));
   btn.classList.add('activo');
-
   document.getElementById('formularioComun').style.display = 'block';
   document.getElementById('nirBox').style.display = producto === 'Expeller' ? 'block' : 'none';
   renderCamposParametros(producto);
@@ -387,7 +474,6 @@ function renderCamposParametros(producto) {
   const cont = document.getElementById('camposParametros');
   cont.innerHTML = '';
   const params = parametrosPorProducto[producto] || [];
-
   for (let i = 0; i < params.length; i += 2) {
     const fila = document.createElement('div');
     fila.className = 'fila-2';
@@ -405,7 +491,7 @@ function renderCamposParametros(producto) {
 
 async function sincronizarNIR() {
   const aviso = document.getElementById('avisoNIR');
-  aviso.innerHTML = '<p style="color:#777; margin-top:8px;">Sincronizando...</p>';
+  aviso.innerHTML = '<p style="color:var(--texto-suave); margin-top:8px;">Sincronizando...</p>';
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
@@ -414,9 +500,7 @@ async function sincronizarNIR() {
     });
     const data = await res.json();
     if (data.ok) {
-      aviso.innerHTML = '<div class="aviso ok" style="margin-top:8px;">' +
-        'Se importaron <b>' + data.importados + '</b> analisis nuevos. ' +
-        '(Total de resultados en el NIR: ' + data.totalEnNIR + ')</div>';
+      aviso.innerHTML = '<div class="aviso ok" style="margin-top:8px;">Se importaron <b>' + data.importados + '</b> analisis nuevos. (Total en NIR: ' + data.totalEnNIR + ')</div>';
     } else {
       aviso.innerHTML = '<div class="aviso error" style="margin-top:8px;">' + data.error + '</div>';
     }
@@ -428,12 +512,10 @@ async function sincronizarNIR() {
 async function guardarAnalisis() {
   const aviso = document.getElementById('avisoGuardar');
   aviso.innerHTML = '';
-
   if (!productoActivoNuevo) {
     aviso.innerHTML = '<div class="aviso error">Elegi un producto primero.</div>';
     return;
   }
-
   const datos = {
     operador: document.getElementById('campoOperador').value,
     tipo: document.getElementById('campoTipo').value,
@@ -443,13 +525,11 @@ async function guardarAnalisis() {
     observaciones: document.getElementById('campoObservaciones').value,
     origenDato: 'Manual'
   };
-
   const params = parametrosPorProducto[productoActivoNuevo] || [];
   params.forEach(p => {
     const el = document.getElementById('param_' + p.clave);
     datos[p.clave] = el ? el.value : '';
   });
-
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
@@ -481,9 +561,6 @@ function limpiarFormulario() {
   });
 }
 
-// ============================================================================
-// CONSULTAR
-// ============================================================================
 function seleccionarProductoConsulta(producto, btn, cont) {
   productoActivoConsulta = producto;
   [...cont.children].forEach(b => b.classList.remove('activo'));
@@ -493,21 +570,17 @@ function seleccionarProductoConsulta(producto, btn, cont) {
 async function buscarAnalisis() {
   const cont = document.getElementById('resultadosConsulta');
   if (!productoActivoConsulta) {
-    cont.innerHTML = '<p style="color:#888;">Elegi un producto primero.</p>';
+    cont.innerHTML = '<p style="color:var(--texto-suave);">Elegi un producto primero.</p>';
     return;
   }
-
-  cont.innerHTML = '<p style="color:#888;">Buscando...</p>';
-
+  cont.innerHTML = '<p style="color:var(--texto-suave);">Buscando...</p>';
   const proveedorCliente = document.getElementById('filtroProveedorCliente').value;
   const desde = document.getElementById('filtroDesde').value;
   const hasta = document.getElementById('filtroHasta').value;
-
   let url = API_URL + '?accion=listar&producto=' + encodeURIComponent(productoActivoConsulta);
   if (proveedorCliente) url += '&proveedorCliente=' + encodeURIComponent(proveedorCliente);
   if (desde) url += '&desde=' + encodeURIComponent(desde);
   if (hasta) url += '&hasta=' + encodeURIComponent(hasta);
-
   try {
     const res = await fetch(url);
     const data = await res.json();
@@ -524,20 +597,12 @@ async function buscarAnalisis() {
 function renderTablaResultados(registros) {
   const cont = document.getElementById('resultadosConsulta');
   if (registros.length === 0) {
-    cont.innerHTML = '<p style="color:#888;">No se encontraron analisis con esos filtros.</p>';
+    cont.innerHTML = '<p style="color:var(--texto-suave);">No se encontraron analisis con esos filtros.</p>';
     return;
   }
-
   let html = '<table><tr><th>Fecha</th><th>Proveedor/Cliente</th><th>Nro. Orden</th><th>Lote</th><th>Operador</th><th>PDF</th></tr>';
   registros.forEach(r => {
-    html += '<tr>' +
-      '<td>' + r.fecha + '</td>' +
-      '<td>' + (r.proveedorCliente || '-') + '</td>' +
-      '<td>' + (r.ordenCompraVenta || '-') + '</td>' +
-      '<td>' + (r.lote || '-') + ' <span class="badge">' + r.id + '</span></td>' +
-      '<td>' + (r.operador || '-') + '</td>' +
-      '<td><button class="btn-secundario" onclick="descargarPDF(\'' + r.id + '\')">Descargar</button></td>' +
-      '</tr>';
+    html += '<tr><td>' + r.fecha + '</td><td>' + (r.proveedorCliente || '-') + '</td><td>' + (r.ordenCompraVenta || '-') + '</td><td>' + (r.lote || '-') + ' <span class="badge">' + r.id + '</span></td><td>' + (r.operador || '-') + '</td><td><button class="btn-secundario" onclick="descargarPDF(\'' + r.id + '\')">Descargar</button></td></tr>';
   });
   html += '</table>';
   cont.innerHTML = html;
@@ -548,10 +613,7 @@ async function descargarPDF(id) {
     const url = API_URL + '?accion=pdf&producto=' + encodeURIComponent(productoActivoConsulta) + '&id=' + encodeURIComponent(id);
     const res = await fetch(url);
     const data = await res.json();
-    if (!data.ok) {
-      alert('No se pudo generar el PDF: ' + data.error);
-      return;
-    }
+    if (!data.ok) { alert('No se pudo generar el PDF: ' + data.error); return; }
     const bytes = atob(data.base64);
     const arr = new Uint8Array(bytes.length);
     for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
@@ -560,14 +622,9 @@ async function descargarPDF(id) {
     link.href = URL.createObjectURL(blob);
     link.download = data.nombreArchivo;
     link.click();
-  } catch (e) {
-    alert('Error al descargar el PDF.');
-  }
+  } catch (e) { alert('Error al descargar el PDF.'); }
 }
 
-// ============================================================================
-// PROVEEDORES
-// ============================================================================
 function sugerirUsuarioEnPantalla() {
   const nombre = document.getElementById('campoNombreProveedor').value;
   let s = nombre.toLowerCase();
@@ -580,15 +637,12 @@ function sugerirUsuarioEnPantalla() {
 async function crearAccesoProveedor() {
   const aviso = document.getElementById('avisoProveedor');
   aviso.innerHTML = '';
-
   const nombreProveedor = document.getElementById('campoNombreProveedor').value.trim();
   const usuario = document.getElementById('campoUsuarioSugerido').value.trim();
-
   if (!nombreProveedor) {
     aviso.innerHTML = '<div class="aviso error">Falta el nombre del proveedor.</div>';
     return;
   }
-
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
@@ -597,11 +651,7 @@ async function crearAccesoProveedor() {
     });
     const data = await res.json();
     if (data.ok) {
-      aviso.innerHTML = '<div class="aviso ok">' +
-        '<b>Acceso creado.</b> Copia estos datos y pasaselos al proveedor:<br><br>' +
-        'Usuario: <b>' + data.usuario + '</b><br>' +
-        'Contrasena (PIN): <b>' + data.password + '</b>' +
-        '</div>';
+      aviso.innerHTML = '<div class="aviso ok"><b>Acceso creado.</b> Copia estos datos y pasaselos al proveedor:<br><br>Usuario: <b>' + data.usuario + '</b><br>Contrasena (PIN): <b>' + data.password + '</b></div>';
       document.getElementById('campoNombreProveedor').value = '';
       document.getElementById('campoUsuarioSugerido').value = '';
       cargarListaUsuarios();
@@ -615,18 +665,12 @@ async function crearAccesoProveedor() {
 
 async function cargarListaUsuarios() {
   const cont = document.getElementById('listaUsuarios');
-  cont.innerHTML = '<p style="color:#888;">Cargando...</p>';
+  cont.innerHTML = '<p style="color:var(--texto-suave);">Cargando...</p>';
   try {
     const res = await fetch(API_URL + '?accion=listarUsuarios');
     const data = await res.json();
-    if (!data.ok) {
-      cont.innerHTML = '<div class="aviso error">' + data.error + '</div>';
-      return;
-    }
-    if (data.usuarios.length === 0) {
-      cont.innerHTML = '<p style="color:#888;">Todavia no hay accesos creados.</p>';
-      return;
-    }
+    if (!data.ok) { cont.innerHTML = '<div class="aviso error">' + data.error + '</div>'; return; }
+    if (data.usuarios.length === 0) { cont.innerHTML = '<p style="color:var(--texto-suave);">Todavia no hay accesos creados.</p>'; return; }
     let html = '<table><tr><th>Usuario</th><th>Proveedor</th><th>Activo</th></tr>';
     data.usuarios.forEach(u => {
       html += '<tr><td>' + u.usuario + '</td><td>' + u.proveedor + '</td><td>' + (u.activo ? 'Si' : 'No') + '</td></tr>';
@@ -638,6 +682,5 @@ async function cargarListaUsuarios() {
   }
 }
 </script>
-
 </body>
 </html>
