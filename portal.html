@@ -6,151 +6,230 @@
 <title>Portal de Proveedores - Agronat</title>
 <style>
   :root {
-    --azul: #1F4E79;
-    --azul2: #2E75B6;
-    --azul-claro: #D6E4F0;
-    --gris: #F2F2F2;
-    --rojo: #FCE4D6;
-    --verde: #E2EFDA;
+    --verde:         #4A8B80;
+    --verde-oscuro:  #2D6960;
+    --verde-claro:   #EBF5F3;
+    --naranja:       #E8922A;
+    --naranja-claro: #FEF6EC;
+    --gris-fondo:    #F4F7F6;
+    --gris-borde:    #DDE8E5;
+    --blanco:        #FFFFFF;
+    --texto:         #1E3532;
+    --texto-suave:   #5D7E79;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: Arial, Helvetica, sans-serif;
-    margin: 0;
-    background: #f5f6f8;
-    color: #222;
+    background: var(--gris-fondo);
+    color: var(--texto);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
   }
-  header {
-    background: var(--azul);
-    color: white;
-    padding: 20px 24px;
-  }
-  header h1 { margin: 0; font-size: 22px; }
-  header p { margin: 4px 0 0; font-size: 13px; color: var(--azul-claro); }
 
-  main {
-    max-width: 700px;
-    margin: 40px auto;
-    padding: 0 16px;
+  /* ── HEADER ── */
+  header {
+    background: var(--blanco);
+    border-bottom: 3px solid var(--verde);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 68px;
   }
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-logo img { height: 38px; display: block; }
+  .header-divider { width: 1px; height: 32px; background: var(--gris-borde); }
+  .header-titulo { font-size: 16px; font-weight: bold; color: var(--verde); letter-spacing: 0.02em; }
+  .header-subtitulo { font-size: 11px; color: var(--texto-suave); margin-top: 1px; }
+
+  /* ── LAYOUT ── */
+  main { max-width: 680px; margin: 0 auto; padding: 32px 16px; }
 
   .tarjeta {
-    background: white;
+    background: var(--blanco);
     border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 28px;
+    box-shadow: 0 1px 4px rgba(45,105,96,0.08);
     margin-bottom: 16px;
+    border: 1px solid var(--gris-borde);
   }
 
-  /* ----- Pantalla de login ----- */
-  #panelLogin { max-width: 380px; margin: 60px auto 0; }
-  #panelLogin h2 { margin-top: 0; color: var(--azul); font-size: 18px; text-align: center; }
+  /* ── LOGIN ── */
+  .login-titulo {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--verde);
+    margin-bottom: 6px;
+  }
+  .login-subtitulo {
+    font-size: 13px;
+    color: var(--texto-suave);
+    margin-bottom: 20px;
+  }
 
   label {
     display: block;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: bold;
-    color: #444;
+    color: var(--texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     margin-top: 14px;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
-  input, select {
+  input {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 10px 12px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 5px;
     font-size: 15px;
+    color: var(--texto);
+    transition: border-color 0.15s;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--verde);
+    box-shadow: 0 0 0 3px rgba(74,139,128,0.12);
   }
 
+  /* ── BOTONES ── */
   .btn-principal {
     margin-top: 20px;
-    background: var(--azul2);
-    color: white;
+    background: var(--verde);
+    color: var(--blanco);
     border: none;
     padding: 12px 20px;
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     width: 100%;
+    transition: background 0.15s;
   }
-  .btn-principal:hover { background: var(--azul); }
+  .btn-principal:hover { background: var(--verde-oscuro); }
   .btn-secundario {
-    background: var(--gris);
-    color: #444;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 4px;
+    background: var(--gris-fondo);
+    color: var(--texto);
+    border: 1px solid var(--gris-borde);
+    padding: 7px 14px;
+    border-radius: 5px;
     font-size: 13px;
     cursor: pointer;
+    transition: background 0.15s;
   }
+  .btn-secundario:hover { background: var(--verde-claro); }
 
+  /* ── AVISOS ── */
   .aviso {
     padding: 10px 14px;
     border-radius: 6px;
     font-size: 13px;
-    margin-top: 14px;
+    margin-top: 12px;
+    border-left: 4px solid;
   }
-  .aviso.error { background: var(--rojo); color: #7b1c00; }
-  .aviso.info { background: var(--azul-claro); color: var(--azul); }
+  .aviso.error { background: #FEF0EC; border-color: #E05A35; color: #7B2210; }
+  .aviso.info  { background: var(--verde-claro); border-color: var(--verde); color: var(--verde-oscuro); }
 
-  /* ----- Pantalla logueado ----- */
-  #panelPortal { display: none; }
+  /* ── PORTAL LOGUEADO ── */
   .barra-usuario {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  .barra-usuario span { font-size: 14px; color: #444; }
+  .barra-usuario .saludo {
+    font-size: 14px;
+    color: var(--texto-suave);
+  }
+  .barra-usuario .saludo b { color: var(--verde); }
 
   .productos {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap;
-    margin: 16px 0;
+    margin: 14px 0;
   }
   .productos button {
     flex: 1;
-    min-width: 110px;
-    padding: 12px;
-    border: 2px solid var(--azul-claro);
-    background: white;
+    padding: 12px 10px;
+    border: 2px solid var(--gris-borde);
+    background: var(--blanco);
     border-radius: 6px;
     font-size: 13px;
     font-weight: bold;
-    color: var(--azul);
+    color: var(--texto-suave);
     cursor: pointer;
+    transition: all 0.15s;
   }
+  .productos button:hover { border-color: var(--verde); color: var(--verde); }
   .productos button.activo {
-    background: var(--azul);
-    color: white;
-    border-color: var(--azul);
+    background: var(--naranja);
+    border-color: var(--naranja);
+    color: var(--blanco);
   }
 
-  .filtros { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end; margin-bottom: 16px; }
+  /* ── FILTROS ── */
+  .filtros {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+  }
+  .filtros .btn-principal { margin-top: 0; }
 
+  /* ── TABLA ── */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { background: var(--azul); color: white; padding: 8px; text-align: left; }
-  td { padding: 8px; border-bottom: 1px solid #eee; }
-  tr:hover { background: var(--gris); }
+  th {
+    background: var(--verde);
+    color: var(--blanco);
+    padding: 9px 10px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+  }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--gris-borde); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--verde-claro); }
+
+  .seccion-label {
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--texto-suave);
+    margin-bottom: 10px;
+  }
 
   @media (max-width: 600px) {
     .filtros { grid-template-columns: 1fr; }
+    header { height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Portal de Proveedores</h1>
-  <p>Agronat S.A. - Control de Calidad</p>
+  <div class="header-logo">
+    <img src="./logo.png" alt="Agronat">
+    <div class="header-divider"></div>
+    <div>
+      <div class="header-titulo">Portal de Proveedores</div>
+      <div class="header-subtitulo">Control de Calidad · Agronat</div>
+    </div>
+  </div>
 </header>
 
 <main>
 
   <!-- ===================== LOGIN ===================== -->
   <div id="panelLogin" class="tarjeta">
-    <h2>Ingresar</h2>
+    <div class="login-titulo">Ingresar</div>
+    <div class="login-subtitulo">Accede a los analisis de calidad de tus entregas</div>
     <label>Usuario</label>
     <input type="text" id="campoUsuario" autocomplete="username">
     <label>Contrasena</label>
@@ -160,14 +239,14 @@
   </div>
 
   <!-- ===================== PORTAL (logueado) ===================== -->
-  <div id="panelPortal">
+  <div id="panelPortal" style="display:none;">
     <div class="tarjeta barra-usuario">
-      <span>Hola, <b id="nombreProveedor"></b></span>
+      <span class="saludo">Hola, <b id="nombreProveedor"></b></span>
       <button class="btn-secundario" onclick="cerrarSesionUsuario()">Cerrar sesion</button>
     </div>
 
     <div class="tarjeta">
-      <label>Elegi el producto</label>
+      <p class="seccion-label">Elegi el producto</p>
       <div class="productos" id="botonesProducto"></div>
 
       <div class="filtros">
@@ -180,12 +259,12 @@
           <input type="date" id="filtroHasta">
         </div>
         <div>
-          <button class="btn-principal" style="margin-top:0;" onclick="buscarMisAnalisis()">Buscar</button>
+          <button class="btn-principal" onclick="buscarMisAnalisis()">Buscar</button>
         </div>
       </div>
 
       <div id="resultados">
-        <p style="color:#888;">Elegi un producto y presiona Buscar.</p>
+        <p style="color:var(--texto-suave);">Elegi un producto y presiona Buscar.</p>
       </div>
     </div>
   </div>
@@ -193,15 +272,10 @@
 </main>
 
 <script>
-// Pegar aqui la URL de tu Apps Script publicado como aplicacion web
-// (la misma que usa index.html, la que termina en /exec)
 const API_URL = 'https://script.google.com/macros/s/AKfycbyj9BXuVUwB09Kc5opWxuBysGokv5xtWS84sTDxvkfOO6YeX8Y3bniz-jfbF4FqhvEq/exec';
-
-const PRODUCTOS = ['Soja', 'Maiz']; // Expeller y Aceite son control interno, no se muestran al proveedor
+const PRODUCTOS = ['Soja', 'Maiz'];
 let productoActivo = null;
 
-// La sesion se guarda solo mientras la pestana del navegador esta abierta.
-// Al cerrarla, hay que volver a ingresar usuario y contrasena.
 function guardarSesion(token, proveedor) {
   sessionStorage.setItem('qc_token', token);
   sessionStorage.setItem('qc_proveedor', proveedor);
@@ -214,12 +288,8 @@ function borrarSesion() {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  if (obtenerToken()) {
-    mostrarPortal();
-  }
+  if (obtenerToken()) mostrarPortal();
   renderBotonesProducto();
-
-  // Permite tocar Enter para ingresar
   document.getElementById('campoPassword').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') iniciarSesion();
   });
@@ -230,12 +300,10 @@ async function iniciarSesion() {
   const password = document.getElementById('campoPassword').value;
   const aviso = document.getElementById('avisoLogin');
   aviso.innerHTML = '';
-
   if (!usuario || !password) {
     aviso.innerHTML = '<div class="aviso error">Completa usuario y contrasena.</div>';
     return;
   }
-
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
@@ -267,16 +335,15 @@ async function cerrarSesionUsuario() {
   document.getElementById('panelPortal').style.display = 'none';
   document.getElementById('panelLogin').style.display = 'block';
   document.getElementById('campoUsuario').value = '';
-  document.getElementById('resultados').innerHTML = '<p style="color:#888;">Elegi un producto y presiona Buscar.</p>';
+  document.getElementById('resultados').innerHTML = '<p style="color:var(--texto-suave);">Elegi un producto y presiona Buscar.</p>';
   productoActivo = null;
-  // Avisa al servidor para invalidar el token (no es obligatorio, pero es mas prolijo)
   try {
     await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify({ accion: 'logout', token: token })
     });
-  } catch (e) { /* no hace falta avisar si falla */ }
+  } catch (e) {}
 }
 
 function renderBotonesProducto() {
@@ -297,39 +364,23 @@ function renderBotonesProducto() {
 async function buscarMisAnalisis() {
   const cont = document.getElementById('resultados');
   if (!productoActivo) {
-    cont.innerHTML = '<p style="color:#888;">Elegi un producto primero.</p>';
+    cont.innerHTML = '<p style="color:var(--texto-suave);">Elegi un producto primero.</p>';
     return;
   }
-
   const token = obtenerToken();
-  if (!token) {
-    cerrarSesionUsuario();
-    return;
-  }
-
-  cont.innerHTML = '<p style="color:#888;">Buscando...</p>';
-
+  if (!token) { cerrarSesionUsuario(); return; }
+  cont.innerHTML = '<p style="color:var(--texto-suave);">Buscando...</p>';
   const desde = document.getElementById('filtroDesde').value;
   const hasta = document.getElementById('filtroHasta').value;
-
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        accion: 'portalListar',
-        token: token,
-        producto: productoActivo,
-        filtros: { desde: desde, hasta: hasta }
-      })
+      body: JSON.stringify({ accion: 'portalListar', token: token, producto: productoActivo, filtros: { desde: desde, hasta: hasta } })
     });
     const data = await res.json();
-
     if (!data.ok) {
-      if (data.error && data.error.indexOf('sesion') !== -1) {
-        cerrarSesionUsuario();
-        return;
-      }
+      if (data.error && data.error.indexOf('sesion') !== -1) { cerrarSesionUsuario(); return; }
       cont.innerHTML = '<div class="aviso error">' + data.error + '</div>';
       return;
     }
@@ -342,18 +393,12 @@ async function buscarMisAnalisis() {
 function renderTabla(registros) {
   const cont = document.getElementById('resultados');
   if (registros.length === 0) {
-    cont.innerHTML = '<p style="color:#888;">No se encontraron analisis con esos filtros.</p>';
+    cont.innerHTML = '<p style="color:var(--texto-suave);">No se encontraron analisis con esos filtros.</p>';
     return;
   }
-
   let html = '<table><tr><th>Fecha</th><th>Nro. Orden</th><th>Lote</th><th>PDF</th></tr>';
   registros.forEach(r => {
-    html += '<tr>' +
-      '<td>' + r.fecha + '</td>' +
-      '<td>' + (r.ordenCompraVenta || '-') + '</td>' +
-      '<td>' + (r.lote || '-') + '</td>' +
-      '<td><button class="btn-secundario" onclick="descargarMiPDF(\'' + r.id + '\')">Descargar</button></td>' +
-      '</tr>';
+    html += '<tr><td>' + r.fecha + '</td><td>' + (r.ordenCompraVenta || '-') + '</td><td>' + (r.lote || '-') + '</td><td><button class="btn-secundario" onclick="descargarMiPDF(\'' + r.id + '\')">Descargar</button></td></tr>';
   });
   html += '</table>';
   cont.innerHTML = html;
@@ -368,10 +413,7 @@ async function descargarMiPDF(id) {
       body: JSON.stringify({ accion: 'portalPDF', token: token, producto: productoActivo, id: id })
     });
     const data = await res.json();
-    if (!data.ok) {
-      alert('No se pudo descargar el PDF: ' + data.error);
-      return;
-    }
+    if (!data.ok) { alert('No se pudo descargar el PDF: ' + data.error); return; }
     const bytes = atob(data.base64);
     const arr = new Uint8Array(bytes.length);
     for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
@@ -385,6 +427,5 @@ async function descargarMiPDF(id) {
   }
 }
 </script>
-
 </body>
 </html>
