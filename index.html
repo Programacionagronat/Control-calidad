@@ -306,7 +306,15 @@
         <div class="fila-2">
           <div>
             <label>Operador</label>
-            <input type="text" id="campoOperador" placeholder="Quien hizo el analisis">
+            <select id="campoOperador">
+              <option value="">Seleccionar operador</option>
+              <option value="Lorena Garcia">Lorena Garcia</option>
+              <option value="Georgina Martinez">Georgina Martinez</option>
+              <option value="Marcelo Ramos">Marcelo Ramos</option>
+              <option value="Joaquin Mainentti">Joaquin Mainentti</option>
+              <option value="Federico Mainentti">Federico Mainentti</option>
+              <option value="Emanuel Geymonat">Emanuel Geymonat</option>
+            </select>
           </div>
           <div>
             <label>Tipo</label>
@@ -319,7 +327,10 @@
         <div class="fila-3">
           <div>
             <label>Proveedor / Cliente</label>
-            <input type="text" id="campoProveedorCliente" placeholder="Nombre">
+            <select id="campoProveedorCliente">
+              <option value="">Seleccionar...</option>
+            </select>
+            <p style="font-size:11px; color:var(--texto-suave); margin-top:4px;">No esta en la lista? Agregalo en la pestana "Proveedores".</p>
           </div>
           <div>
             <label>Nro. de orden de compra/venta</label>
@@ -432,10 +443,25 @@
   <!-- ===================== VISTA: PROVEEDORES ===================== -->
   <div id="vistaProveedores" style="display:none;">
     <div class="tarjeta">
-      <h3>Crear acceso para un proveedor</h3>
+      <h3>Agregar proveedor/cliente a la lista</h3>
       <p style="color:var(--texto-suave); font-size:13px; margin-top:6px;">
-        Genera usuario y PIN para que el proveedor entre al portal y vea solo sus analisis.
-        El PIN se muestra una sola vez — copialos antes de cerrar esta pantalla.
+        Esto solo lo agrega a la lista desplegable que se usa al cargar un analisis (no le da acceso a nada).
+        Usalo para cualquier proveedor o cliente nuevo, lo necesite o no para entrar al portal.
+      </p>
+
+      <label>Nombre del proveedor/cliente <span style="font-weight:normal; text-transform:none; letter-spacing:0;">(escribilo tal cual queres que aparezca siempre)</span></label>
+      <input type="text" id="campoNuevoProveedorCliente" placeholder="Ej: Molino Santa Rosa">
+
+      <button class="btn-principal" onclick="agregarProveedorClienteUI()">Agregar a la lista</button>
+      <div id="avisoNuevoProveedorCliente"></div>
+    </div>
+
+    <div class="tarjeta">
+      <h3>Crear acceso al portal (opcional)</h3>
+      <p style="color:var(--texto-suave); font-size:13px; margin-top:6px;">
+        Solo hace falta esto si ademas queres que el proveedor entre al portal a ver sus analisis.
+        Si el nombre todavia no esta en la lista, se agrega solo al crear el acceso.
+        El PIN se muestra una sola vez — copialo antes de cerrar esta pantalla.
       </p>
 
       <label>Nombre del proveedor <span style="font-weight:normal; text-transform:none; letter-spacing:0;">(tiene que ser EXACTAMENTE igual a como lo escribis en "Proveedor / Cliente" en los analisis)</span></label>
@@ -450,10 +476,20 @@
 
     <div class="tarjeta">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-        <h3 style="margin:0;">Accesos ya creados</h3>
+        <h3 style="margin:0;">Accesos al portal ya creados</h3>
         <button class="btn-secundario" onclick="cargarListaUsuarios()">Actualizar lista</button>
       </div>
       <div id="listaUsuarios">
+        <p style="color:var(--texto-suave);">Presiona "Actualizar lista" para verlos.</p>
+      </div>
+    </div>
+
+    <div class="tarjeta">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <h3 style="margin:0;">Proveedores/Clientes registrados</h3>
+        <button class="btn-secundario" onclick="cargarListaProveedoresClientes()">Actualizar lista</button>
+      </div>
+      <div id="listaProveedoresClientes">
         <p style="color:var(--texto-suave);">Presiona "Actualizar lista" para verlos.</p>
       </div>
     </div>
@@ -468,6 +504,7 @@ let parametrosPorProducto = {};
 let productoActivoNuevo = null;
 let productoActivoConsulta = null;
 let productoActivoEnvio = null;
+let listaProveedoresClientesCache = [];
 
 const PRODUCTOS = ['Soja', 'Maiz', 'Expeller', 'Aceite'];
 
@@ -477,6 +514,7 @@ window.addEventListener('DOMContentLoaded', () => {
   renderBotonesProducto('botonesProductoEnvio', seleccionarProductoEnvio);
   inicializarFiltroProductoEnvio();
   cargarParametros();
+  cargarProveedoresClientes();
 });
 
 function inicializarFiltroProductoEnvio() {
@@ -717,6 +755,7 @@ async function crearAccesoProveedor() {
       document.getElementById('campoNombreProveedor').value = '';
       document.getElementById('campoUsuarioSugerido').value = '';
       cargarListaUsuarios();
+      cargarProveedoresClientes();
     } else {
       aviso.innerHTML = '<div class="aviso error">' + data.error + '</div>';
     }
@@ -882,6 +921,87 @@ async function descargarPDFEnvioLab(id) {
     link.click();
   } catch (e) {
     alert('Error al descargar el PDF.');
+  }
+}
+
+// ============================================================================
+// PROVEEDORES / CLIENTES - lista maestra
+// ============================================================================
+async function cargarProveedoresClientes() {
+  try {
+    const res = await fetch(API_URL + '?accion=listarProveedoresClientes');
+    const data = await res.json();
+    if (data.ok) {
+      listaProveedoresClientesCache = data.proveedoresClientes;
+      renderSelectProveedorCliente();
+      renderTablaProveedoresClientes();
+    }
+  } catch (e) {
+    console.error('No se pudo cargar la lista de proveedores/clientes', e);
+  }
+}
+
+function renderSelectProveedorCliente() {
+  const sel = document.getElementById('campoProveedorCliente');
+  if (!sel) return;
+  const valorActual = sel.value;
+  sel.innerHTML = '<option value="">Seleccionar...</option>';
+  listaProveedoresClientesCache.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.nombre;
+    opt.textContent = p.nombre;
+    sel.appendChild(opt);
+  });
+  sel.value = valorActual;
+}
+
+function renderTablaProveedoresClientes() {
+  const cont = document.getElementById('listaProveedoresClientes');
+  if (!cont) return;
+  if (listaProveedoresClientesCache.length === 0) {
+    cont.innerHTML = '<p style="color:var(--texto-suave);">Todavia no hay proveedores/clientes registrados.</p>';
+    return;
+  }
+  let html = '<table><tr><th>Nombre</th><th>Acceso al portal</th></tr>';
+  listaProveedoresClientesCache.forEach(p => {
+    html += '<tr><td>' + p.nombre + '</td><td>' + (p.accesoPortal ? 'Si' : 'No') + '</td></tr>';
+  });
+  html += '</table>';
+  cont.innerHTML = html;
+}
+
+function cargarListaProveedoresClientes() {
+  cargarProveedoresClientes();
+}
+
+async function agregarProveedorClienteUI() {
+  const aviso = document.getElementById('avisoNuevoProveedorCliente');
+  aviso.innerHTML = '';
+  const nombre = document.getElementById('campoNuevoProveedorCliente').value.trim();
+  if (!nombre) {
+    aviso.innerHTML = '<div class="aviso error">Escribi un nombre primero.</div>';
+    return;
+  }
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'agregarProveedorCliente', nombre: nombre })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      if (data.yaExistia) {
+        aviso.innerHTML = '<div class="aviso info">"' + data.nombre + '" ya estaba en la lista.</div>';
+      } else {
+        aviso.innerHTML = '<div class="aviso ok">"' + data.nombre + '" agregado a la lista.</div>';
+      }
+      document.getElementById('campoNuevoProveedorCliente').value = '';
+      cargarProveedoresClientes();
+    } else {
+      aviso.innerHTML = '<div class="aviso error">' + data.error + '</div>';
+    }
+  } catch (e) {
+    aviso.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor.</div>';
   }
 }
 </script>
