@@ -290,6 +290,7 @@
 <nav>
   <button id="navNuevo" class="activo" onclick="mostrarVista('nuevo')">Nuevo analisis</button>
   <button id="navConsultar" onclick="mostrarVista('consultar')">Consultar</button>
+  <button id="navEnviosLab" onclick="mostrarVista('enviosLab')">Envios a laboratorio</button>
   <button id="navProveedores" onclick="mostrarVista('proveedores')">Proveedores</button>
 </nav>
 
@@ -382,6 +383,52 @@
     </div>
   </div>
 
+  <!-- ===================== VISTA: ENVIOS A LABORATORIO ===================== -->
+  <div id="vistaEnviosLab" style="display:none;">
+    <div class="tarjeta">
+      <h3>Registrar nuevo envio a laboratorio</h3>
+      <p style="color:var(--texto-suave); font-size:13px; margin-top:6px;">
+        Elegi el producto y el sistema genera solo el ID de lote (no hay otros datos para completar).
+        Despues, cuando llegue el resultado del laboratorio, volves a esta pestana y adjuntas el PDF.
+      </p>
+
+      <p class="seccion-label" style="margin-top:16px;">Producto de la muestra</p>
+      <div class="productos" id="botonesProductoEnvio"></div>
+
+      <label>Observaciones <span style="font-weight:normal; text-transform:none; letter-spacing:0;">(condiciones del envio, comentarios, etc. - opcional)</span></label>
+      <textarea id="campoObservacionesEnvio" placeholder="Notas sobre esta muestra (opcional)"></textarea>
+
+      <button class="btn-principal" onclick="crearEnvioLabUI()">Generar ID y registrar envio</button>
+      <div id="avisoEnvioLab"></div>
+    </div>
+
+    <div class="tarjeta">
+      <p class="seccion-label">Envios registrados</p>
+      <div class="filtros" style="grid-template-columns: 1fr 1fr auto;">
+        <div>
+          <label>Producto</label>
+          <select id="filtroProductoEnvio">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div>
+          <label>Estado</label>
+          <select id="filtroEstadoEnvio">
+            <option value="">Todos</option>
+            <option value="Pendiente">Pendiente</option>
+            <option value="Completado">Completado</option>
+          </select>
+        </div>
+        <div>
+          <button class="btn-principal" onclick="cargarEnviosLab()">Actualizar lista</button>
+        </div>
+      </div>
+      <div id="resultadosEnviosLab">
+        <p style="color:var(--texto-suave);">Presiona "Actualizar lista" para verlos.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== VISTA: PROVEEDORES ===================== -->
   <div id="vistaProveedores" style="display:none;">
     <div class="tarjeta">
@@ -420,14 +467,27 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbyj9BXuVUwB09Kc5opWxuBy
 let parametrosPorProducto = {};
 let productoActivoNuevo = null;
 let productoActivoConsulta = null;
+let productoActivoEnvio = null;
 
 const PRODUCTOS = ['Soja', 'Maiz', 'Expeller', 'Aceite'];
 
 window.addEventListener('DOMContentLoaded', () => {
   renderBotonesProducto('botonesProducto', seleccionarProductoNuevo);
   renderBotonesProducto('botonesProductoConsulta', seleccionarProductoConsulta);
+  renderBotonesProducto('botonesProductoEnvio', seleccionarProductoEnvio);
+  inicializarFiltroProductoEnvio();
   cargarParametros();
 });
+
+function inicializarFiltroProductoEnvio() {
+  const sel = document.getElementById('filtroProductoEnvio');
+  PRODUCTOS.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p;
+    sel.appendChild(opt);
+  });
+}
 
 function renderBotonesProducto(idContenedor, onClick) {
   const cont = document.getElementById(idContenedor);
@@ -455,9 +515,11 @@ async function cargarParametros() {
 function mostrarVista(vista) {
   document.getElementById('vistaNuevo').style.display = vista === 'nuevo' ? 'block' : 'none';
   document.getElementById('vistaConsultar').style.display = vista === 'consultar' ? 'block' : 'none';
+  document.getElementById('vistaEnviosLab').style.display = vista === 'enviosLab' ? 'block' : 'none';
   document.getElementById('vistaProveedores').style.display = vista === 'proveedores' ? 'block' : 'none';
   document.getElementById('navNuevo').classList.toggle('activo', vista === 'nuevo');
   document.getElementById('navConsultar').classList.toggle('activo', vista === 'consultar');
+  document.getElementById('navEnviosLab').classList.toggle('activo', vista === 'enviosLab');
   document.getElementById('navProveedores').classList.toggle('activo', vista === 'proveedores');
 }
 
@@ -679,6 +741,147 @@ async function cargarListaUsuarios() {
     cont.innerHTML = html;
   } catch (e) {
     cont.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor.</div>';
+  }
+}
+
+// ============================================================================
+// ENVIOS A LABORATORIO
+// ============================================================================
+function seleccionarProductoEnvio(producto, btn, cont) {
+  productoActivoEnvio = producto;
+  [...cont.children].forEach(b => b.classList.remove('activo'));
+  btn.classList.add('activo');
+}
+
+async function crearEnvioLabUI() {
+  const aviso = document.getElementById('avisoEnvioLab');
+  aviso.innerHTML = '';
+  if (!productoActivoEnvio) {
+    aviso.innerHTML = '<div class="aviso error">Elegi un producto primero.</div>';
+    return;
+  }
+  const observaciones = document.getElementById('campoObservacionesEnvio').value;
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'crearEnvioLab', producto: productoActivoEnvio, observaciones: observaciones })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      aviso.innerHTML = '<div class="aviso ok">Envio registrado. ID de lote: <b>' + data.id + '</b></div>';
+      document.getElementById('campoObservacionesEnvio').value = '';
+      cargarEnviosLab();
+    } else {
+      aviso.innerHTML = '<div class="aviso error">' + data.error + '</div>';
+    }
+  } catch (e) {
+    aviso.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor.</div>';
+  }
+}
+
+async function cargarEnviosLab() {
+  const cont = document.getElementById('resultadosEnviosLab');
+  cont.innerHTML = '<p style="color:var(--texto-suave);">Cargando...</p>';
+  const producto = document.getElementById('filtroProductoEnvio').value;
+  const estado = document.getElementById('filtroEstadoEnvio').value;
+  let url = API_URL + '?accion=listarEnviosLab';
+  if (producto) url += '&producto=' + encodeURIComponent(producto);
+  if (estado) url += '&estado=' + encodeURIComponent(estado);
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.ok) {
+      cont.innerHTML = '<div class="aviso error">' + data.error + '</div>';
+      return;
+    }
+    renderTablaEnviosLab(data.registros);
+  } catch (e) {
+    cont.innerHTML = '<div class="aviso error">No se pudo conectar con el servidor.</div>';
+  }
+}
+
+function renderTablaEnviosLab(registros) {
+  const cont = document.getElementById('resultadosEnviosLab');
+  if (registros.length === 0) {
+    cont.innerHTML = '<p style="color:var(--texto-suave);">No hay envios registrados con esos filtros.</p>';
+    return;
+  }
+  let html = '<table><tr><th>ID</th><th>Fecha</th><th>Producto</th><th>Estado</th><th>Observaciones</th><th>Accion</th></tr>';
+  registros.forEach(r => {
+    const esCompletado = r.estado === 'Completado';
+    const colorBadge = esCompletado ? '#1B5E3A' : '#6B3D0A';
+    const fondoBadge = esCompletado ? '#EDF7F0' : '#FEF6EC';
+    const accion = esCompletado
+      ? '<button class="btn-secundario" onclick="descargarPDFEnvioLab(\'' + r.id + '\')">Descargar PDF</button>'
+      : '<button class="btn-secundario" onclick="document.getElementById(\'fileEnvio_' + r.id + '\').click()">Adjuntar PDF</button>' +
+        '<input type="file" id="fileEnvio_' + r.id + '" accept="application/pdf" style="display:none;" onchange="manejarArchivoEnvioLab(\'' + r.id + '\', this)">';
+    html += '<tr>' +
+      '<td><b>' + r.id + '</b></td>' +
+      '<td>' + r.fecha + '</td>' +
+      '<td>' + r.producto + '</td>' +
+      '<td><span class="badge" style="background:' + fondoBadge + '; color:' + colorBadge + ';">' + r.estado + '</span></td>' +
+      '<td>' + (r.observaciones || '-') + '</td>' +
+      '<td>' + accion + '</td>' +
+      '</tr>';
+  });
+  html += '</table>';
+  cont.innerHTML = html;
+}
+
+function manejarArchivoEnvioLab(id, inputElement) {
+  const file = inputElement.files[0];
+  if (!file) return;
+  if (file.type !== 'application/pdf') {
+    alert('Solo se pueden adjuntar archivos PDF.');
+    inputElement.value = '';
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64Completo = e.target.result;
+    const base64 = base64Completo.split(',')[1];
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          accion: 'adjuntarPDFEnvioLab',
+          id: id,
+          base64: base64,
+          nombreArchivo: file.name,
+          mimeType: file.type
+        })
+      });
+      const data = await res.json();
+      if (data.ok) {
+        cargarEnviosLab();
+      } else {
+        alert('No se pudo adjuntar el PDF: ' + data.error);
+      }
+    } catch (err) {
+      alert('No se pudo conectar con el servidor.');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function descargarPDFEnvioLab(id) {
+  try {
+    const url = API_URL + '?accion=descargarEnvioLabPDF&id=' + encodeURIComponent(id);
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data.ok) { alert('No se pudo descargar el PDF: ' + data.error); return; }
+    const bytes = atob(data.base64);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    const blob = new Blob([arr], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = data.nombreArchivo;
+    link.click();
+  } catch (e) {
+    alert('Error al descargar el PDF.');
   }
 }
 </script>
